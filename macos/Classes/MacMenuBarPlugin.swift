@@ -39,6 +39,12 @@ public class MacMenuBarPlugin: NSObject, FlutterPlugin {
     /// This is used to store the original implementations of menu item actions
     /// so we can forward to them if the Flutter app doesn't handle the action.
     private var originalActions: [Selector: OriginalAction] = [:]
+
+    /// A dictionary that maps custom menu item IDs to their selectors.
+    private var customMenuItems: [String: Selector] = [:]
+    
+    /// Counter for generating unique selectors for custom menu items.
+    private var menuItemCounter: Int = 0
   /// Registers the plugin with the Flutter engine.
   ///
   /// This method is called by the Flutter engine when the plugin is first registered.
@@ -67,10 +73,359 @@ public class MacMenuBarPlugin: NSObject, FlutterPlugin {
   ///   - call: The method call from Flutter.
   ///   - result: A closure to be called with the result of the method call.
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    // This plugin currently doesn't handle any method calls from Flutter
-    // (it only sends method calls to Flutter), so we don't need to implement this.
-    result(nil)
+    switch call.method {
+        case "addMenuItem":
+            handleAddMenuItem(call: call, result: result)
+        case "addSubmenu":
+            handleAddSubmenu(call: call, result: result)
+        case "removeMenuItem":
+            handleRemoveMenuItem(call: call, result: result)
+        case "updateMenuItem":
+            handleUpdateMenuItem(call: call, result: result)
+        case "setMenuItemEnabled":
+            handleSetMenuItemEnabled(call: call, result: result)
+        default:
+            result(FlutterMethodNotImplemented)
+        }
   }
+
+  /// Handles adding a menu item to the menu bar.
+    private func handleAddMenuItem(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let menuId = args["menuId"] as? String,
+              let itemId = args["itemId"] as? String,
+              let title = args["title"] as? String else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", 
+                              message: "Missing required arguments", 
+                              details: nil))
+            return
+        }
+        
+        let index = args["index"] as? Int
+        let keyEquivalent = args["keyEquivalent"] as? String ?? ""
+        let keyModifiers = args["keyModifiers"] as? [String] ?? []
+        let enabled = args["enabled"] as? Bool ?? true
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                result(false)
+                return
+            }
+            
+            let success = self.addMenuItem(
+                menuId: menuId,
+                itemId: itemId,
+                title: title,
+                index: index,
+                keyEquivalent: keyEquivalent,
+                keyModifiers: keyModifiers,
+                enabled: enabled
+            )
+            result(success)
+        }
+    }
+    
+    /// Handles adding a submenu to the menu bar.
+    private func handleAddSubmenu(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let parentMenuId = args["parentMenuId"] as? String,
+              let submenuId = args["submenuId"] as? String,
+              let title = args["title"] as? String else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", 
+                              message: "Missing required arguments", 
+                              details: nil))
+            return
+        }
+        
+        let index = args["index"] as? Int
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                result(false)
+                return
+            }
+            
+            let success = self.addSubmenu(
+                parentMenuId: parentMenuId,
+                submenuId: submenuId,
+                title: title,
+                index: index
+            )
+            result(success)
+        }
+    }
+    
+    /// Handles removing a menu item.
+    private func handleRemoveMenuItem(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let itemId = args["itemId"] as? String else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", 
+                              message: "Missing itemId", 
+                              details: nil))
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                result(false)
+                return
+            }
+            
+            let success = self.removeMenuItem(itemId: itemId)
+            result(success)
+        }
+    }
+    
+    /// Handles updating a menu item.
+    private func handleUpdateMenuItem(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let itemId = args["itemId"] as? String else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", 
+                              message: "Missing itemId", 
+                              details: nil))
+            return
+        }
+        
+        let title = args["title"] as? String
+        let enabled = args["enabled"] as? Bool
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                result(false)
+                return
+            }
+            
+            let success = self.updateMenuItem(
+                itemId: itemId,
+                title: title,
+                enabled: enabled
+            )
+            result(success)
+        }
+    }
+    
+    /// Handles enabling/disabling a menu item.
+    private func handleSetMenuItemEnabled(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let itemId = args["itemId"] as? String,
+              let enabled = args["enabled"] as? Bool else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", 
+                              message: "Missing required arguments", 
+                              details: nil))
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                result(false)
+                return
+            }
+            
+            let success = self.setMenuItemEnabled(itemId: itemId, enabled: enabled)
+            result(success)
+        }
+    }
+    
+    /// Adds a menu item to the specified menu.
+    private func addMenuItem(
+        menuId: String,
+        itemId: String,
+        title: String,
+        index: Int?,
+        keyEquivalent: String,
+        keyModifiers: [String],
+        enabled: Bool
+    ) -> Bool {
+        guard let menu = findMenu(byId: menuId) else {
+            return false
+        }
+        
+        // Create a unique selector for this menu item
+        menuItemCounter += 1
+        let selectorName = "handleCustomMenuItem\(menuItemCounter):"
+        let selector = NSSelectorFromString(selectorName)
+        
+        // Store the mapping
+        customMenuItems[itemId] = selector
+        
+        // Add the selector implementation dynamically
+        let block: @convention(block) (Any?) -> Void = { [weak self] sender in
+            self?.handleCustomMenuItemAction(itemId: itemId, sender: sender)
+        }
+        
+        let imp = imp_implementationWithBlock(block)
+        class_addMethod(type(of: self), selector, imp, "v@:@")
+        
+        // Create the menu item
+        let menuItem = NSMenuItem(
+            title: title,
+            action: selector,
+            keyEquivalent: keyEquivalent
+        )
+        menuItem.target = self
+        menuItem.isEnabled = enabled
+        menuItem.representedObject = itemId
+        
+        // Apply key modifiers
+        menuItem.keyEquivalentModifierMask = parseKeyModifiers(keyModifiers)
+        
+        // Insert at the specified index or append
+        if let index = index, index >= 0, index <= menu.items.count {
+            menu.insertItem(menuItem, at: index)
+        } else {
+            menu.addItem(menuItem)
+        }
+        
+        return true
+    }
+    
+    /// Adds a submenu to the specified parent menu.
+    private func addSubmenu(
+        parentMenuId: String,
+        submenuId: String,
+        title: String,
+        index: Int?
+    ) -> Bool {
+        guard let parentMenu = findMenu(byId: parentMenuId) else {
+            return false
+        }
+        
+        // Create the submenu
+        let submenu = NSMenu(title: title)
+        
+        // Create the menu item that will hold the submenu
+        let menuItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        menuItem.submenu = submenu
+        menuItem.identifier = NSUserInterfaceItemIdentifier(submenuId)
+        menuItem.representedObject = submenuId
+        
+        // Insert at the specified index or append
+        if let index = index, index >= 0, index <= parentMenu.items.count {
+            parentMenu.insertItem(menuItem, at: index)
+        } else {
+            parentMenu.addItem(menuItem)
+        }
+        
+        return true
+    }
+    
+    /// Removes a menu item by its ID.
+    private func removeMenuItem(itemId: String) -> Bool {
+        guard let mainMenu = NSApplication.shared.mainMenu else { return false }
+        
+        if let menuItem = findMenuItem(byId: itemId, in: mainMenu) {
+            menuItem.menu?.removeItem(menuItem)
+            customMenuItems.removeValue(forKey: itemId)
+            return true
+        }
+        
+        return false
+    }
+    
+    /// Updates a menu item's properties.
+    private func updateMenuItem(itemId: String, title: String?, enabled: Bool?) -> Bool {
+        guard let mainMenu = NSApplication.shared.mainMenu,
+              let menuItem = findMenuItem(byId: itemId, in: mainMenu) else {
+            return false
+        }
+        
+        if let title = title {
+            menuItem.title = title
+        }
+        
+        if let enabled = enabled {
+            menuItem.isEnabled = enabled
+        }
+        
+        return true
+    }
+    
+    /// Sets a menu item's enabled state.
+    private func setMenuItemEnabled(itemId: String, enabled: Bool) -> Bool {
+        return updateMenuItem(itemId: itemId, title: nil, enabled: enabled)
+    }
+    
+    /// Handles custom menu item actions.
+    private func handleCustomMenuItemAction(itemId: String, sender: Any?) {
+        channel.invokeMethod("onMenuItemSelected", arguments: ["itemId": itemId])
+    }
+    
+    /// Finds a menu by its ID.
+    private func findMenu(byId menuId: String) -> NSMenu? {
+        guard let mainMenu = NSApplication.shared.mainMenu else { return nil }
+        
+        // Check if it's the main menu itself
+        if menuId == "main" {
+            return mainMenu
+        }
+        
+        // Search through all menus recursively
+        return findMenuRecursive(menuId: menuId, in: mainMenu)
+    }
+    
+    /// Recursively searches for a menu by ID.
+    private func findMenuRecursive(menuId: String, in menu: NSMenu) -> NSMenu? {
+        // Check if this menu matches
+        if menu.title == menuId {
+            return menu
+        }
+        
+        // Check all submenus
+        for item in menu.items {
+            if let submenu = item.submenu {
+                if submenu.title == menuId || item.representedObject as? String == menuId {
+                    return submenu
+                }
+                
+                // Recursively search in submenu
+                if let found = findMenuRecursive(menuId: menuId, in: submenu) {
+                    return found
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    /// Finds a menu item by its ID.
+    private func findMenuItem(byId itemId: String, in menu: NSMenu) -> NSMenuItem? {
+        for item in menu.items {
+            if item.representedObject as? String == itemId {
+                return item
+            }
+            
+            if let submenu = item.submenu,
+               let found = findMenuItem(byId: itemId, in: submenu) {
+                return found
+            }
+        }
+        
+        return nil
+    }
+    
+    /// Parses key modifiers from string array.
+    private func parseKeyModifiers(_ modifiers: [String]) -> NSEvent.ModifierFlags {
+        var flags: NSEvent.ModifierFlags = []
+        
+        for modifier in modifiers {
+            switch modifier.lowercased() {
+            case "command", "cmd":
+                flags.insert(.command)
+            case "shift":
+                flags.insert(.shift)
+            case "option", "alt":
+                flags.insert(.option)
+            case "control", "ctrl":
+                flags.insert(.control)
+            case "function", "fn":
+                flags.insert(.function)
+            default:
+                break
+            }
+        }
+        
+        return flags
+    }
     
     /// Finds a menu item in the main menu that matches the specified selector.
     ///
