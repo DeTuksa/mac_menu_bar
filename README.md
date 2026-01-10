@@ -5,12 +5,16 @@
 
 A Flutter plugin that provides access to macOS menu bar actions, allowing Flutter applications to handle standard menu items like Cut, Copy, Paste, and Select All.
 
+![Screenshot](readme/screenshot.jpeg)
+
 ## Features
 
-- Intercept and handle standard macOS menu bar actions
-- Support for Cut, Copy, Paste, and Select All menu items
-- Fallback to default system behavior when actions aren't handled
-- Clean and simple API for handling menu actions
+- Intercept Standard Menu Actions: Handle Cut, Copy, Paste, and Select All from the macOS menu bar
+- Custom Menu Items: Add your own menu items to existing menus or create new ones
+- Submenu Support: Create nested menu structures with unlimited depth
+- Keyboard Shortcuts: Define shortcuts using Flutter's SingleActivator class
+- Clean API: Type-safe, well-documented API following Flutter best practices
+- Fallback Support: Automatically falls back to system behavior when actions aren't handled
 
 ## Installation
 
@@ -18,7 +22,7 @@ Add `mac_menu_bar` to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  mac_menu_bar: ^1.0.0
+  mac_menu_bar: ^0.0.2
 ```
 
 Then run `flutter pub get` to install the package.
@@ -85,6 +89,40 @@ MacMenuBar.onPaste(() async {
   // Let the system handle the paste operation
   return false;
 });
+```
+
+### Adding Custom Menu Items
+You can add custom menu items to existing menus or create new ones:
+
+```dart
+await MacMenuBar.addMenuItem(
+  menuId: 'View',
+  itemId: 'refresh',
+  title: 'Refresh',
+);
+```
+
+### Creating Submenus
+You can create submenus with unlimited depth:
+```dart
+// Create a custom submenu in the main menu bar
+await MacMenuBar.addSubmenu(
+  parentMenuId: 'main',
+  submenuId: 'tools',
+  title: 'Tools',
+);
+
+// Add items to the submenu
+await MacMenuBar.addMenuItem(
+  menuId: 'tools',
+  itemId: 'tool_1',
+  title: 'Developer Tools',
+  shortcut: const SingleActivator(
+    LogicalKeyboardKey.digit1,
+    meta: true,
+    alt: true,
+  ),
+);
 ```
 
 ## Platform Support

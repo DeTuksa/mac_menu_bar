@@ -2,7 +2,7 @@ name: mac_menu_bar
 description: |
   A Flutter plugin that provides access to macOS menu bar actions, allowing Flutter applications
   to handle standard menu items like Cut, Copy, Paste, and Select All with custom behavior.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/DeTuksa/mac_menu_bar
 
 environment:
