@@ -21,9 +21,10 @@ abstract class MacMenuBarPlatform extends PlatformInterface {
   /// The default instance of [MacMenuBarPlatform] to use.
   ///
   /// Defaults to [MethodChannelMacMenuBar] on macOS,
-  /// or [MacMenuBarNoop] in release mode on non-macOS platforms.
+  /// or [MacMenuBarNoop] on all other platforms.
+  /// For testing, set MacMenuBarPlatform.instance to a mock implementation.
   static MacMenuBarPlatform _instance =
-      (defaultTargetPlatform == TargetPlatform.macOS || kDebugMode)
+      defaultTargetPlatform == TargetPlatform.macOS
           ? MethodChannelMacMenuBar()
           : MacMenuBarNoop();
 
@@ -31,6 +32,7 @@ abstract class MacMenuBarPlatform extends PlatformInterface {
   ///
   /// This getter returns the current platform implementation, which defaults to
   /// [MethodChannelMacMenuBar] on macOS, or [MacMenuBarNoop] on non-macOS platforms.
+  /// For testing, set MacMenuBarPlatform.instance to a mock implementation.
   static MacMenuBarPlatform get instance => _instance;
 
   /// Sets the platform instance that will be used by the plugin.

@@ -206,14 +206,7 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
     SingleActivator? shortcut,
     bool enabled = true,
   }) async {
-    // Only prevent method calls in release mode on non-macOS platforms
-    // Allow calls in debug mode and tests to work properly
-    if (!_isMacOS && !kDebugMode) {
-      return false;
-    }
-
-    // In test environment on non-macOS, allow method calls to proceed
-    // (don't return early, let the method channel call happen)
+    if (!_isMacOS && kReleaseMode) return false;
 
     try {
       final args = <String, dynamic>{
@@ -252,14 +245,7 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
     required String title,
     int? index,
   }) async {
-    // Only prevent method calls in release mode on non-macOS platforms
-    // Allow calls in debug mode and tests to work properly
-    if (!_isMacOS && !kDebugMode) {
-      return false;
-    }
-
-    // In test environment on non-macOS, allow method calls to proceed
-    // (don't return early, let the method channel call happen)
+    if (!_isMacOS && kReleaseMode) return false;
 
     try {
       final result = await methodChannel
@@ -278,14 +264,7 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
 
   @override
   Future<bool> removeMenuItem(String itemId) async {
-    // Only prevent method calls in release mode on non-macOS platforms
-    // Allow calls in debug mode and tests to work properly
-    if (!_isMacOS && !kDebugMode) {
-      return false;
-    }
-
-    // In test environment on non-macOS, allow method calls to proceed
-    // (don't return early, let the method channel call happen)
+    if (!_isMacOS && kReleaseMode) return false;
 
     try {
       final result = await methodChannel.invokeMethod<bool>(
@@ -301,14 +280,7 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
 
   @override
   Future<bool> setMenuItemEnabled(String itemId, bool enabled) async {
-    // Only prevent method calls in release mode on non-macOS platforms
-    // Allow calls in debug mode and tests to work properly
-    if (!_isMacOS && !kDebugMode) {
-      return false;
-    }
-
-    // In test environment on non-macOS, allow method calls to proceed
-    // (don't return early, let the method channel call happen)
+    if (!_isMacOS && kReleaseMode) return false;
 
     try {
       final result = await methodChannel.invokeMethod<bool>(
@@ -328,14 +300,7 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
     String? title,
     bool? enabled,
   }) async {
-    // Only prevent method calls in release mode on non-macOS platforms
-    // Allow calls in debug mode and tests to work properly
-    if (!_isMacOS && !kDebugMode) {
-      return false;
-    }
-
-    // In test environment on non-macOS, allow method calls to proceed
-    // (don't return early, let the method channel call happen)
+    if (!_isMacOS && kReleaseMode) return false;
 
     try {
       final result = await methodChannel

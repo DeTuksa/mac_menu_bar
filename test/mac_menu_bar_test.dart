@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/shortcuts.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -111,14 +113,26 @@ void main() {
   final MacMenuBarPlatform initialPlatform = MacMenuBarPlatform.instance;
 
   test('$MethodChannelMacMenuBar is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelMacMenuBar>());
+    // On non-macOS platforms, the default is MacMenuBarNoop
+    // This test should verify the platform detection works correctly
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      expect(initialPlatform, isInstanceOf<MethodChannelMacMenuBar>());
+    } else {
+      expect(initialPlatform, isInstanceOf<MacMenuBarNoop>());
+    }
   });
 
   group('MacMenuBarPlatform', () {
     final MacMenuBarPlatform initialPlatform = MacMenuBarPlatform.instance;
 
     test('$MethodChannelMacMenuBar is the default instance', () {
-      expect(initialPlatform, isInstanceOf<MethodChannelMacMenuBar>());
+      // On non-macOS platforms, the default is MacMenuBarNoop
+      // This test should verify the platform detection works correctly
+      if (defaultTargetPlatform == TargetPlatform.macOS) {
+        expect(initialPlatform, isInstanceOf<MethodChannelMacMenuBar>());
+      } else {
+        expect(initialPlatform, isInstanceOf<MacMenuBarNoop>());
+      }
     });
 
     test('Can set a mock platform instance', () {
@@ -363,6 +377,7 @@ void main() {
 
     setUp(() {
       platform = MethodChannelMacMenuBar();
+      MacMenuBarPlatform.instance = platform;
       methodCallLog.clear();
 
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger

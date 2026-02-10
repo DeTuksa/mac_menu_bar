@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mac_menu_bar/mac_menu_bar_method_channel.dart';
+import 'package:mac_menu_bar/mac_menu_bar_platform_interface.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +13,7 @@ void main() {
 
   setUp(() {
     platform = MethodChannelMacMenuBar();
+    MacMenuBarPlatform.instance = platform;
     methodCallLog.clear();
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
