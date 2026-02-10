@@ -20,6 +20,12 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('mac_menu_bar');
 
+  /// Whether the current platform is macOS.
+  ///
+  /// This is used to determine whether to attempt platform channel communication
+  /// or use no-op behavior.
+  final bool _isMacOS;
+
   /// Handler for custom menu item selections.
   ///
   /// This callback is invoked when a custom menu item is selected by the user.
@@ -54,7 +60,8 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
   ///
   /// This constructor initializes the method channel and sets up the handler
   /// for incoming method calls from the native platform.
-  MethodChannelMacMenuBar() {
+  MethodChannelMacMenuBar()
+    : _isMacOS = defaultTargetPlatform == TargetPlatform.macOS {
     methodChannel.setMethodCallHandler(_handleMethodCall);
   }
 
@@ -199,6 +206,15 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
     SingleActivator? shortcut,
     bool enabled = true,
   }) async {
+    // Only prevent method calls in release mode on non-macOS platforms
+    // Allow calls in debug mode and tests to work properly
+    if (!_isMacOS && !kDebugMode) {
+      return false;
+    }
+
+    // In test environment on non-macOS, allow method calls to proceed
+    // (don't return early, let the method channel call happen)
+
     try {
       final args = <String, dynamic>{
         'menuId': menuId,
@@ -236,6 +252,15 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
     required String title,
     int? index,
   }) async {
+    // Only prevent method calls in release mode on non-macOS platforms
+    // Allow calls in debug mode and tests to work properly
+    if (!_isMacOS && !kDebugMode) {
+      return false;
+    }
+
+    // In test environment on non-macOS, allow method calls to proceed
+    // (don't return early, let the method channel call happen)
+
     try {
       final result = await methodChannel
           .invokeMethod<bool>('addSubmenu', <String, dynamic>{
@@ -253,6 +278,15 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
 
   @override
   Future<bool> removeMenuItem(String itemId) async {
+    // Only prevent method calls in release mode on non-macOS platforms
+    // Allow calls in debug mode and tests to work properly
+    if (!_isMacOS && !kDebugMode) {
+      return false;
+    }
+
+    // In test environment on non-macOS, allow method calls to proceed
+    // (don't return early, let the method channel call happen)
+
     try {
       final result = await methodChannel.invokeMethod<bool>(
         'removeMenuItem',
@@ -267,6 +301,15 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
 
   @override
   Future<bool> setMenuItemEnabled(String itemId, bool enabled) async {
+    // Only prevent method calls in release mode on non-macOS platforms
+    // Allow calls in debug mode and tests to work properly
+    if (!_isMacOS && !kDebugMode) {
+      return false;
+    }
+
+    // In test environment on non-macOS, allow method calls to proceed
+    // (don't return early, let the method channel call happen)
+
     try {
       final result = await methodChannel.invokeMethod<bool>(
         'setMenuItemEnabled',
@@ -285,6 +328,15 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
     String? title,
     bool? enabled,
   }) async {
+    // Only prevent method calls in release mode on non-macOS platforms
+    // Allow calls in debug mode and tests to work properly
+    if (!_isMacOS && !kDebugMode) {
+      return false;
+    }
+
+    // In test environment on non-macOS, allow method calls to proceed
+    // (don't return early, let the method channel call happen)
+
     try {
       final result = await methodChannel
           .invokeMethod<bool>('updateMenuItem', <String, dynamic>{

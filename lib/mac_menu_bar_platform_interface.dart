@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart' show SingleActivator;
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'mac_menu_bar_method_channel.dart';
+import 'mac_menu_bar_noop.dart';
 
 /// The interface that implementations of `mac_menu_bar` must implement.
 ///
@@ -18,14 +20,17 @@ abstract class MacMenuBarPlatform extends PlatformInterface {
 
   /// The default instance of [MacMenuBarPlatform] to use.
   ///
-  /// Defaults to [MethodChannelMacMenuBar] which uses method channels for
-  /// communication with the native platform.
-  static MacMenuBarPlatform _instance = MethodChannelMacMenuBar();
+  /// Defaults to [MethodChannelMacMenuBar] on macOS,
+  /// or [MacMenuBarNoop] in release mode on non-macOS platforms.
+  static MacMenuBarPlatform _instance =
+      (defaultTargetPlatform == TargetPlatform.macOS || kDebugMode)
+          ? MethodChannelMacMenuBar()
+          : MacMenuBarNoop();
 
   /// Returns the current platform instance.
   ///
   /// This getter returns the current platform implementation, which defaults to
-  /// [MethodChannelMacMenuBar].
+  /// [MethodChannelMacMenuBar] on macOS, or [MacMenuBarNoop] on non-macOS platforms.
   static MacMenuBarPlatform get instance => _instance;
 
   /// Sets the platform instance that will be used by the plugin.
