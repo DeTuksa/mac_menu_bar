@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.3] - 2026-02-10
+
+### Added
+
+- Multi-platform support for static analysis compatibility
+- No-op implementation for non-macOS platforms to prevent MissingPluginException
+- Platform detection in method channel implementation
+- Safe API calls that return false on non-macOS platforms
+- Web platform implementation with proper plugin registration
+
+### Changed
+
+- Modified method channel implementation to gracefully handle non-macOS platforms
+- Updated pubspec.yaml to support multi-platform development workflows
+- Improved cross-platform compatibility for dependent packages
+- Enhanced platform interface with automatic implementation selection
+
+### Fixed
+
+- Fixed pana analyzer marking packages as macOS-only when depending on mac_menu_bar
+- Resolved MissingPluginException on non-macOS platforms
+- Eliminated static analysis restrictions for multi-platform packages
+- Fixed web platform registration and plugin resolution issues
+
+### Credits
+
+Special thanks to @csells (https://github.com/csells) for identifying and helping resolve platform registration issues and providing valuable insights into Flutter plugin architecture patterns.
+
 ## [0.0.2] - 2026-01-11
 
 ### Added

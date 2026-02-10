@@ -2,6 +2,9 @@ import 'package:flutter/widgets.dart' show SingleActivator;
 
 import 'mac_menu_bar_platform_interface.dart';
 
+// Export the no-op implementation for plugin registration
+export 'mac_menu_bar_noop.dart';
+
 /// A plugin that provides access to macOS menu bar actions in Flutter applications.
 ///
 /// This class allows you to handle standard menu bar actions (Cut, Copy, Paste, Select All)
