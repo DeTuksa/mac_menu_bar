@@ -22,7 +22,7 @@ Add `mac_menu_bar` to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  mac_menu_bar: ^0.0.2
+  mac_menu_bar: ^0.0.4
 ```
 
 Then run `flutter pub get` to install the package.
