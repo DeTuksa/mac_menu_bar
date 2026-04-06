@@ -89,6 +89,21 @@ class MacMenuBar {
   static void onSelectAll(Future<bool> Function() handler) =>
       MacMenuBarPlatform.instance.setOnSelectAllFromMenu(handler);
 
+  /// Registers a callback to be invoked when the Settings/Preferences menu item is selected.
+  ///
+  /// The [handler] should return a [Future] that completes with `true` if the
+  /// operation was handled, or `false` to allow the default system behavior.
+  ///
+  /// Example:
+  /// ```dart
+  /// MacMenuBar.onSettings(() async {
+  ///   // Open settings dialog
+  ///   return true;
+  /// });
+  /// ```
+  static void onSettings(Future<bool> Function() handler) =>
+      instance.setOnSettingsFromMenu(handler);
+
   /// Adds a menu item to the specified menu.
   ///
   /// [menuId] identifies the menu to add the item to. Common menu IDs include:

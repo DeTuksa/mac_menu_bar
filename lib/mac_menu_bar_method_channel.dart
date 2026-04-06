@@ -56,6 +56,12 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
   /// system keyboard shortcut (Cmd+A).
   Future<bool> Function()? _onSelectAll;
 
+  /// Callback for handling the Settings/Preferences menu action.
+  ///
+  /// This is called when the user selects the Settings (Preferences) menu item
+  /// or uses the system keyboard shortcut (Cmd+,).
+  Future<bool> Function()? _onSettings;
+
   /// Constructs a [MethodChannelMacMenuBar] and sets up the method call handler.
   ///
   /// This constructor initializes the method channel and sets up the handler
@@ -116,6 +122,8 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
         return await _onPaste?.call() ?? false;
       case 'onSelectAllFromMenu':
         return await _onSelectAll?.call() ?? false;
+      case 'onSettingsFromMenu':
+        return await _onSettings?.call() ?? false;
       case 'onMenuItemSelected':
         _handleMenuItemSelected(call.arguments);
       default:
@@ -195,6 +203,11 @@ class MethodChannelMacMenuBar extends MacMenuBarPlatform {
   @override
   void setOnSelectAllFromMenu(Future<bool> Function()? callback) {
     _onSelectAll = callback;
+  }
+
+  @override
+  void setOnSettingsFromMenu(Future<bool> Function()? callback) {
+    _onSettings = callback;
   }
 
   @override

@@ -1,6 +1,6 @@
 name: mac_menu_bar
 description: A Flutter plugin that provides comprehensive macOS menu bar customization and management for Flutter desktop applications.
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/DeTuksa/mac_menu_bar
 
 environment:

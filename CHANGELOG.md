@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.0.4] - 2026-04-06
+
+### Added
+
+- Added `MacMenuBar.onSettings` API to handle the macOS Settings (Preferences) menu item.
+- Support for identifying the Settings menu item by its standard keyboard shortcut (Cmd+,).
+
+### Changed
+
+- Improved Swift code safety by using `[weak self]` in closures to prevent retain cycles.
+- Updated example app to demonstrate Settings menu handling.
+
+### Fixed
+
+- Fixed an issue where the Settings (Preferences) menu item was always disabled in the macOS application menu.
+- Resolved Swift compilation errors related to capture semantics in closures.
+
 ## [0.0.3] - 2026-02-10
 
 ### Added

@@ -80,6 +80,14 @@ abstract class MacMenuBarPlatform extends PlatformInterface {
   /// Set to `null` to restore the default system behavior.
   void setOnSelectAllFromMenu(Future<bool> Function()? callback);
 
+  /// Sets the callback that will be invoked when the Settings/Preferences menu item is selected.
+  ///
+  /// The callback should return a [Future] that completes with `true` if the
+  /// operation was handled, or `false` to allow the default system behavior.
+  ///
+  /// Set to `null` to restore the default system behavior.
+  void setOnSettingsFromMenu(Future<bool> Function()? callback);
+
   /// Adds a menu item to the specified menu.
   ///
   /// [menuId] is the identifier of the menu to add the item to (e.g., "main", "File", etc.).

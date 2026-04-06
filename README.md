@@ -22,7 +22,7 @@ Add `mac_menu_bar` to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  mac_menu_bar: ^0.0.2
+  mac_menu_bar: ^0.0.4
 ```
 
 Then run `flutter pub get` to install the package.
@@ -71,6 +71,13 @@ void initState() {
   MacMenuBar.onSelectAll(() async {
     debugPrint('Select All menu item selected');
     // Implement your select all logic here
+    return true;
+  });
+
+  // Handle Settings menu item (Cmd+,)
+  MacMenuBar.onSettings(() async {
+    debugPrint('Settings menu item selected');
+    // Open your app's settings dialog here
     return true;
   });
 }

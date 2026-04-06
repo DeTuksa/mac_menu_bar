@@ -57,4 +57,7 @@ class MacMenuBarWebPlugin extends MacMenuBarPlatform {
 
   @override
   void setOnSelectAllFromMenu(Future<bool> Function()? callback) {}
+
+  @override
+  void setOnSettingsFromMenu(Future<bool> Function()? callback) {}
 }

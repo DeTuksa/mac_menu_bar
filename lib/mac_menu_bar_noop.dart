@@ -27,6 +27,9 @@ class MacMenuBarNoop extends MacMenuBarPlatform {
   void setOnSelectAllFromMenu(Future<bool> Function()? callback) {}
 
   @override
+  void setOnSettingsFromMenu(Future<bool> Function()? callback) {}
+
+  @override
   Future<bool> addMenuItem({
     required String menuId,
     required String itemId,

@@ -36,6 +36,9 @@ class MockMacMenuBarPlatform
   void setOnSelectAllFromMenu(Future<bool> Function()? callback) {}
 
   @override
+  void setOnSettingsFromMenu(Future<bool> Function()? callback) {}
+
+  @override
   void setMenuItemSelectedHandler(MenuItemSelectedHandler handler) {
     _menuItemSelectedHandler = handler;
   }

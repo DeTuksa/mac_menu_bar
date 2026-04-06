@@ -33,6 +33,13 @@ class _MyAppState extends State<MyApp> {
       debugPrint('Copy menu item selected');
       return false;
     });
+    MacMenuBar.onSettings(() async {
+      debugPrint('Settings menu item selected (Cmd+,)');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Settings menu item selected (Cmd+,)')),
+      );
+      return true;
+    });
     _setupCustomMenus();
   }
 

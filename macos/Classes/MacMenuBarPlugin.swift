@@ -465,10 +465,19 @@ public class MacMenuBarPlugin: NSObject, FlutterPlugin {
         // Find the menu item with the specified selector
         guard let item = findMenuItem(for: selector) else { return }
         
+        overrideMenuItem(item: item, selector: selector, handler: handler)
+    }
+
+    /// Overrides a specific menu item's action with a custom handler.
+    private func overrideMenuItem(
+        item: NSMenuItem,
+        selector: Selector,
+        handler: Selector
+    ) {
         // Save the original target and selector so we can forward to it later if needed
         originalActions[selector] = OriginalAction(
             target: item.target as AnyObject?,
-            selector: selector
+            selector: item.action ?? selector
         )
         
         // Replace the target and action with our own
@@ -504,6 +513,28 @@ public class MacMenuBarPlugin: NSObject, FlutterPlugin {
             selector: #selector(NSText.selectAll(_:)),
             handler: #selector(handleSelectAll(_:))
         )
+
+        // Override the Settings/Preferences menu item
+        if let settingsItem = findSettingsMenuItem() {
+            overrideMenuItem(
+                item: settingsItem,
+                selector: #selector(handleSettings(_:)),
+                handler: #selector(handleSettings(_:))
+            )
+        }
+    }
+
+    /// Finds the Settings (Preferences) menu item by its standard keyboard shortcut (Cmd+,).
+    private func findSettingsMenuItem() -> NSMenuItem? {
+        guard let mainMenu = NSApplication.shared.mainMenu,
+              let appMenu = mainMenu.items.first?.submenu else { return nil }
+        
+        for item in appMenu.items {
+            if item.keyEquivalent == "," && item.keyEquivalentModifierMask.contains(.command) {
+                return item
+            }
+        }
+        return nil
     }
     
     /// Forwards an action to the original handler.
@@ -549,29 +580,40 @@ public class MacMenuBarPlugin: NSObject, FlutterPlugin {
     }
     
     @objc func handleCut(_ sender: Any?) {
-        channel.invokeMethod("onCutFromMenu", arguments: nil) { handled in
+        channel.invokeMethod("onCutFromMenu", arguments: nil) { [weak self] handled in
             if let didHandle = handled as? Bool, didHandle {
                 return
             }
-            self.forwardDefaultAction(#selector(NSText.cut(_:)), sender: sender)
+            self?.forwardDefaultAction(#selector(NSText.cut(_:)), sender: sender)
         }
     }
 
     @objc func handlePaste(_ sender: Any?) {
-        channel.invokeMethod("onPasteFromMenu", arguments: nil) { handled in
+        channel.invokeMethod("onPasteFromMenu", arguments: nil) { [weak self] handled in
             if let didHandle = handled as? Bool, didHandle {
                 return
             }
-            self.forwardDefaultAction(#selector(NSText.paste(_:)), sender: sender)
+            self?.forwardDefaultAction(#selector(NSText.paste(_:)), sender: sender)
         }
     }
 
     @objc func handleSelectAll(_ sender: Any?) {
-        channel.invokeMethod("onSelectAllFromMenu", arguments: nil) { handled in
+        channel.invokeMethod("onSelectAllFromMenu", arguments: nil) { [weak self] handled in
             if let didHandle = handled as? Bool, didHandle {
                 return
             }
-            self.forwardDefaultAction(#selector(NSText.selectAll(_:)), sender: sender)
+            self?.forwardDefaultAction(#selector(NSText.selectAll(_:)), sender: sender)
+        }
+    }
+
+    @objc func handleSettings(_ sender: Any?) {
+        channel.invokeMethod("onSettingsFromMenu", arguments: nil) { [weak self] handled in
+            if let didHandle = handled as? Bool, didHandle {
+                return
+            }
+            // For settings, if not handled, we don't have a standard default to forward to
+            // since it was originally unassigned in the XIB.
+            self?.forwardDefaultAction(#selector(MacMenuBarPlugin.handleSettings(_:)), sender: sender)
         }
     }
 }
