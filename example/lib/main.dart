@@ -36,9 +36,7 @@ class _MyAppState extends State<MyApp> {
     MacMenuBar.onSettings(() async {
       debugPrint('Settings menu item selected (Cmd+,)');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Settings menu item selected (Cmd+,)'),
-        ),
+        const SnackBar(content: Text('Settings menu item selected (Cmd+,)')),
       );
       return true;
     });
