@@ -73,6 +73,13 @@ void initState() {
     // Implement your select all logic here
     return true;
   });
+
+  // Handle Settings menu item (Cmd+,)
+  MacMenuBar.onSettings(() async {
+    debugPrint('Settings menu item selected');
+    // Open your app's settings dialog here
+    return true;
+  });
 }
 ```
 
