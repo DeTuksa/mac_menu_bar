@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.0.5] - 2026-07-08
+
+### Added
+
+- Added Swift Package Manager (SPM) support for macOS.
+
+### Changed
+
+- Relocated macOS native source files to standard Swift package directory structure.
+- Updated CocoaPods `.podspec` to reference the new source path, maintaining compatibility with projects that do not yet use Swift Package Manager.
+
 ## [0.0.4] - 2026-04-06
 
 ### Added
